@@ -9,7 +9,7 @@ export * from './decorators/methods';
 export * from './decorators/services';
 export * from './server/model/server-types';
 export * from './server/server';
-export * from './authenticator/passport';
+// export * from './authenticator/passport';
 
 export { Return };
 export { Errors };

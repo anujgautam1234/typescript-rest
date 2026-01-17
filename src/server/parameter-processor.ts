@@ -72,22 +72,28 @@ export class ParameterProcessor {
         return parameterMapper;
     }
 
-    private convertType(paramValue: string | boolean, paramType: Function): any {
+    private convertType(paramValue: string | string[] | boolean | undefined, paramType: Function): any {
         const serializedType = paramType['name'];
         this.debugger.runtime('Processing parameter. received type: %s, received value:', serializedType, paramValue);
+
+        // Express can give arrays when query/path params repeat
+        const normalizedValue = Array.isArray(paramValue) ? paramValue[0] : paramValue;
+
         switch (serializedType) {
             case 'Number':
-                return paramValue === undefined ? paramValue : parseFloat(paramValue as string);
+                return normalizedValue === undefined ? normalizedValue : parseFloat(normalizedValue as string);
+
             case 'Boolean':
-                return paramValue === undefined ? paramValue : paramValue === 'true' || paramValue === true;
+                return normalizedValue === undefined
+                    ? normalizedValue
+                    : normalizedValue === 'true' || normalizedValue === true;
+
             default:
                 let converter = ServerContainer.get().paramConverters.get(paramType);
                 if (!converter) {
                     converter = ParameterProcessor.defaultParamConverter;
                 }
-
-                return converter(paramValue);
+                return converter(normalizedValue);
         }
     }
 }
-
